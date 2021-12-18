@@ -92,6 +92,7 @@ tw-sidebar {
 
 (display: &quot;Equip Init&quot;)
 (set: $gear to (dm:))
+(set: $cart to (dm:))
 (set: $bullets to 0)
 (set: $weight to 0)
 (set: $carry to 0)
@@ -1017,6 +1018,7 @@ _dream
 ]
 },]</tw-passagedata><tw-passagedata pid="25" name="Statblock" tags="" position="0,1200" size="100,100">{
 (if: $debug)[(link-undo: &quot;Undo&quot;)]
+(if: $cart is not datamap)[(set: $cart to (dm:))]
 }&#39;&#39;$name&#39;&#39;, (print: $role&#39;s name) {
 (link: &quot;rename&quot;)[
 (set: $name to (prompt: &quot;Character Name&quot;, $name))
@@ -1047,10 +1049,11 @@ _dream
 (display: &quot;appear&quot;)
 
 (display: &quot;relate&quot;)
+[[Edit flavour-&gt;Flavour]]
 
 |tiny&gt;[(display: &quot;tiny&quot;)]
 
-{(link: &quot;Save&quot;)[
+{(link-rerun: &quot;Save &quot;)[
 	(if: (save-game: $name))[
 		Game Saved!
 	](else:)[
@@ -1348,15 +1351,22 @@ Armour: (for: each _arm, ...(datanames:$armour))[_arm, (print: $armour&#39;s (_a
 ]
 [[Back-&gt;Statblock]] </tw-passagedata><tw-passagedata pid="38" name="Add Mutation" tags="" position="0,1825" size="100,100">{
 (set: _random to (random: 1,25))
+(set: _attDam to &quot;none&quot;)
 }&#39;&#39;New Mutation&#39;&#39;
 |mut&gt;[Mutation: (if: _random is not 0)[(print: $mutList&#39;s (_random)&#39;s name)] ]
 {(link: &quot;Random&quot;)[
 	(goto: &quot;Add Mutation&quot;)
 ]}
-{(link: &quot;Add&quot;)[
-	(set: $mutation to it + $mutList&#39;s (_random))
+{(link-replace: &quot;Add&quot;)[
+	Attribute to damage:
+	(dropdown: bind _attDam, &quot;Strength&quot;, &quot;Agility&quot;, &quot;Wits&quot;, &quot;Empathy&quot;)
+	(link: &quot;Done&quot;)[
+		(set: $mutation to it + (a:$mutList&#39;s (_random)))
+		(set: $att&#39;s (_attDam) to it - 1)
+		(goto: &quot;Statblock&quot;)
+	]
 ]}
-[[Back-&gt;Statblock]] </tw-passagedata><tw-passagedata pid="39" name="gear" tags="" position="200,1325" size="100,100">&#39;&#39;Gear&#39;&#39; (set: $weight to 0)
+[[Nope-&gt;Statblock]] </tw-passagedata><tw-passagedata pid="39" name="gear" tags="" position="200,1325" size="100,100">&#39;&#39;Gear&#39;&#39; (set: $weight to 0)(set: $weight to it + (floor: $bullet / 10) / 2)
 (for: each _gear, ...(datanames:$gear))[{
 (if: $gear&#39;s (_gear)&#39;s qt &lt;= 0)[
 	(move: $gear&#39;s (_gear) into _bin)
@@ -1382,9 +1392,65 @@ x(print: $gear&#39;s (_gear)&#39;s qt)
 		(display: &quot;gear&quot;)
 	]
 ]
+
+(link: &quot;cart&quot;)[
+	(set: _trans to (num:(prompt: &quot;Amount (number)&quot;, &quot;&quot;)))
+	(if: $cart contains _gear)[
+		(set: $cart&#39;s (_gear)&#39;s qt to it + _trans)
+	](else:)[
+		(set: $cart to it + (dm: _gear, 
+			(dm: &quot;wt&quot;, $equipW&#39;s (_gear)&#39;s wt,
+			&quot;qt&quot;, _trans)
+		))
+	]
+	(replace: ?gear)[(display: &quot;gear&quot;)]
+]
 ]}
 ]
 Cap: $carry, Load: $weight
+
+&#39;&#39;Cart&#39;&#39;(set: $cWeight to 0)
+(for: each _gear, ...(datanames: $cart))[{
+(if: $cart&#39;s (_gear)&#39;s qt &lt;= 0)[
+	(move: $cart&#39;s (_gear) into _bin)
+](else:)[
+_gear,
+wt. (print: $cart&#39;s (_gear)&#39;s wt),
+(set: $cWeight to it +
+	($cart&#39;s (_gear)&#39;s wt * $cart&#39;s (_gear)&#39;s qt)
+)
+
+(link: &quot;-&quot;)[
+	(set: $cart&#39;s (_gear)&#39;s qt to it - 1)
+	(replace: ?gear)[
+		(display: &quot;gear&quot;)
+	]
+]
+
+x(print: $cart&#39;s (_gear)&#39;s qt)
+
+(link: &quot;+&quot;)[
+	(set: $cart&#39;s (_gear)&#39;s qt to it + 1)
+	(replace: ?gear)[
+		(display: &quot;gear&quot;)
+	]
+]
+
+(link: &quot;carry&quot;)[
+	(set: _trans to (num:(prompt: &quot;Amount (number)&quot;, &quot;&quot;)))
+	(if: $gear contains _gear)[
+		(set: $gear&#39;s (_gear)&#39;s qt to it + _trans)
+	](else:)[
+		(set: $gear to it + (dm: _gear, 
+			(dm: &quot;wt&quot;, $equipW&#39;s (_gear)&#39;s wt,
+			&quot;qt&quot;, _trans)
+		))
+	]
+	(replace: ?gear)[(display: &quot;gear&quot;)]
+]
+]}
+]
+Weight: $cWeight
 Bullets: {
 (if: $bullets &gt; 0)[
 	(link: &quot;-&quot;)[
@@ -1404,8 +1470,7 @@ $bullets
 	]
 ]
 }
-[[Add Gear]]
-&lt;!-- add + and - --&gt;</tw-passagedata><tw-passagedata pid="40" name="Equip Init" tags="" position="375,950" size="100,100">{
+[[Add Gear]]</tw-passagedata><tw-passagedata pid="40" name="Equip Init" tags="" position="375,950" size="100,100">{
 (set: $equipList to (dm:
 	&quot;Grub (Ration)&quot;, (dm:&quot;wt&quot;, 0.25),
 	&quot;Clean Water (Ration)&quot;, (dm:&quot;wt&quot;, 0.25),
@@ -1554,7 +1619,7 @@ $bullets
 |skills&gt;[(display: &quot;sk&quot;)]
 
 [[Back-&gt;Statblock]]</tw-passagedata><tw-passagedata pid="44" name="Add Talent" tags="" position="100,1700" size="100,100">{
-
+(set: _tal to $talents)
 }&#39;&#39;Add Talent&#39;&#39;
 |talents&gt;[(display: &quot;tal&quot;)]
 
@@ -1662,7 +1727,7 @@ Current Talents: (for: each _talent, ...$talents)[(print: _talent&#39;s name),]
 (set: $upgrade to it - 1)
 (replace: ?talents)[(display: &quot;tal&quot;)]
 ]
-](elseif: $talents contains _talent)[
+](elseif: $talents contains _talent and _tal does not contain _talent)[
 (link: &quot;Remove &quot; + _talent&#39;s name)[
 (set: $talents to it - (a: _talent))
 (set: $upgrade to it + 1)
@@ -1681,7 +1746,7 @@ Current Talents: (for: each _talent, ...$talents)[(print: _talent&#39;s name),]
 )[
 	(link: &quot;-&quot;)[
 		(set: $skill&#39;s (_skill)&#39;s score to it - 1)
-		(set: $upgrade to it - 1)
+		(set: $upgrade to it + 1)
 		(replace: ?skills)[
 			(display: &quot;sk&quot;)
 		]
