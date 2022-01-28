@@ -1441,8 +1441,14 @@ x(print: $cart&#39;s (_gear)&#39;s qt)
 		(set: $gear&#39;s (_gear)&#39;s qt to it +
 			(num:(prompt: &quot;Amount (number)&quot;, &quot;&quot;)))
 	](else:)[
+	(set: _wt to 0)
+		(if: $equipW contains _gear)[
+			(set: _wt to $equipW&#39;s (_gear)&#39;s wt)
+		](elseif: $equipList contains _gear)[
+			(set: _wt to $equipList&#39;s (_gear)&#39;s wt(
+		]
 		(set: $gear to it + (dm: _gear, 
-			(dm: &quot;wt&quot;, $equipW&#39;s (_gear)&#39;s wt,
+			(dm: &quot;wt&quot;, _tw,
 			&quot;qt&quot;, (num:(prompt: &quot;Amount (number)&quot;, &quot;&quot;)))
 		))
 	]
@@ -1492,7 +1498,6 @@ $bullets
 	&quot;Tools&quot;, (dm:&quot;wt&quot;, 1),
 	&quot;Pots &amp; Pans&quot;, (dm:&quot;wt&quot;, 1)
 ))
-
 (set: $equipW to (dm:
 	&quot;Unarmed&quot;, (dm: &quot;wt&quot;, 0),
 	&quot;Blunt Instrument&quot;, (dm: &quot;wt&quot;, 1),
