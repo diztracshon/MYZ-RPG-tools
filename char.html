@@ -1394,13 +1394,13 @@ x(print: $gear&#39;s (_gear)&#39;s qt)
 ]
 
 (link: &quot;cart&quot;)[
-	(set: _trans to (num:(prompt: &quot;Amount (number)&quot;, &quot;&quot;)))
 	(if: $cart contains _gear)[
-		(set: $cart&#39;s (_gear)&#39;s qt to it + _trans)
+		(set: $cart&#39;s (_gear)&#39;s qt to it +
+			(num:(prompt: &quot;Amount (number)&quot;, &quot;&quot;)))
 	](else:)[
 		(set: $cart to it + (dm: _gear, 
 			(dm: &quot;wt&quot;, $equipW&#39;s (_gear)&#39;s wt,
-			&quot;qt&quot;, _trans)
+			&quot;qt&quot;, (num:(prompt: &quot;Amount (number)&quot;, &quot;&quot;)))
 		))
 	]
 	(replace: ?gear)[(display: &quot;gear&quot;)]
@@ -1437,13 +1437,13 @@ x(print: $cart&#39;s (_gear)&#39;s qt)
 ]
 
 (link: &quot;carry&quot;)[
-	(set: _trans to (num:(prompt: &quot;Amount (number)&quot;, &quot;&quot;)))
 	(if: $gear contains _gear)[
-		(set: $gear&#39;s (_gear)&#39;s qt to it + _trans)
+		(set: $gear&#39;s (_gear)&#39;s qt to it +
+			(num:(prompt: &quot;Amount (number)&quot;, &quot;&quot;)))
 	](else:)[
 		(set: $gear to it + (dm: _gear, 
 			(dm: &quot;wt&quot;, $equipW&#39;s (_gear)&#39;s wt,
-			&quot;qt&quot;, _trans)
+			&quot;qt&quot;, (num:(prompt: &quot;Amount (number)&quot;, &quot;&quot;)))
 		))
 	]
 	(replace: ?gear)[(display: &quot;gear&quot;)]
