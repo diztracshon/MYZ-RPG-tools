@@ -1394,7 +1394,7 @@ x(print: $gear&#39;s (_gear)&#39;s qt)
 ]
 
 (link: &quot;cart&quot;)[
-	(if: $cart contains _gear)[
+	(if: (datanames:$cart) contains _gear)[
 		(set: $cart&#39;s (_gear)&#39;s qt to it +
 			(num:(prompt: &quot;Amount (number)&quot;, &quot;&quot;)))
 	](else:)[
