@@ -1303,11 +1303,12 @@ _weap,
 (for: each _talent, ...$talents)[(print: _talent&#39;s name) (link-replace: &quot;more&quot;)[(link: &quot;less&quot;)[(replace: ?tal)[(display: &quot;talents disp&quot;)]]
 (print: _talent&#39;s desc)
 ]
-]</tw-passagedata><tw-passagedata pid="34" name="mutations disp" tags="" position="100,1450" size="100,100">&#39;&#39;Mutations&#39;&#39;
+]</tw-passagedata><tw-passagedata pid="34" name="mutations disp" tags="" position="100,1450" size="100,100">&#39;&#39;Mutations&#39;&#39;(if: $mutation&#39;s length &gt; 0)[
 (for: each _mut, ...$mutation)[(print: _mut&#39;s name) (link-replace: &quot;more&quot;)[(link: &quot;less&quot;)[(replace: ?mut)[(display: &quot;mutations disp&quot;)]]
 (print: _mut&#39;s desc)
 ]
-]
+]](else:)[
+No mutations yet:]
 [[Add Mutation]]</tw-passagedata><tw-passagedata pid="35" name="mut points" tags="" position="200,1450" size="100,100">MP: {
 (if: $mPoints &gt; 0)[
 (link: &quot;-&quot;)[
@@ -1514,7 +1515,7 @@ $bullets
 	&quot;Bow&quot;, (dm:&quot;wt&quot;, 1),
 	&quot;Scrap Pistol&quot;, (dm:&quot;wt&quot;, 1),
 	&quot;Scrap Rifle&quot;, (dm:&quot;wt&quot;, 1),
-	&quot;Derringer&quot;, (dm:&quot;wt&quot;, 0.5),
+	&quot;Scrap Derringer&quot;, (dm:&quot;wt&quot;, 0.5),
 	&quot;Flame Thrower&quot;, (dm:&quot;wt&quot;, 2),
 	&quot;Scrap Cannon&quot;, (dm:&quot;wt&quot;, 0)
 ))
